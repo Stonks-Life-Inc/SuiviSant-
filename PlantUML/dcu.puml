@@ -1,0 +1,18 @@
+left to right direction
+skinparam style strictuml
+skinparam packageStyle rect
+actor Humain
+rectangle "Application" {
+ (Se connecter) as login
+ (Ajouter des données) as ad
+ (Supprimer des données) as sd
+ (Consulter les graphiques) as cg
+ 
+}
+Humain -- ad
+Humain -- sd
+Humain -- cg
+Humain -- login
+login <.. ad: <<include>>
+login <.. sd: <<include>>
+login <.. cg: <<include>>

@@ -1,0 +1,50 @@
+skinparam style strictuml
+
+alt login
+activate Utilisateur
+Utilisateur -> Système : login()
+activate Système
+Système -> Système : checkLogin()
+Système --> Utilisateur : login()
+deactivate Système 
+end
+
+alt Manipuler donnée
+
+group Ajouter donnée
+Utilisateur -> Système : ajouterDonnee()
+activate Système
+Système -> BDD : ajouterDonnee()
+activate BDD
+BDD --> Système : donneeAjoutee()
+deactivate BDD
+Système --> Utilisateur : donneeAjoutee()
+deactivate Système
+end
+
+group supprimer donnee
+Utilisateur -> Système : supprimerDonnee()
+activate Système
+Système -> BDD : supprimerDonnee()
+activate BDD
+BDD --> Système : donneeSupprimee()
+deactivate BDD
+Système --> Utilisateur : donneeSupprimee()
+deactivate Système
+end
+
+group afficher graphiques
+Utilisateur -> Système : AfficherGraphique()
+activate Système
+Système -> BDD : recupererDonnee()
+activate BDD
+BDD --> Système : donneesEnvoyees()
+deactivate BDD
+Système -> Système : creerGraphique()
+Système --> Utilisateur : afficherGraphique()
+deactivate Système
+end
+
+end
+
+deactivate Utilisateur
