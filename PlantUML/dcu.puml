@@ -3,16 +3,26 @@ skinparam style strictuml
 skinparam packageStyle rect
 actor Humain
 rectangle "Application" {
- (Se connecter) as login
+ (Choisir un profil) as login
  (Ajouter des données) as ad
  (Supprimer des données) as sd
  (Consulter les graphiques) as cg
- 
+ (Consulter données) as cd
+ (Glycémie) as gly
+ (Corpulence) as cor
+ (Sommeil) as som
+ (Sport) as spo 
 }
-Humain -- ad
-Humain -- sd
-Humain -- cg
-Humain -- login
-login <.. ad: <<include>>
-login <.. sd: <<include>>
-login <.. cg: <<include>>
+Humain --> cd
+Humain --> ad
+Humain --> sd
+Humain --> cg
+Humain --> login
+ad -- ​cor
+ad -- som
+ad -- gly
+ad -- spo
+sd -- cor
+sd -- som
+sd -- gly
+sd -- sp
