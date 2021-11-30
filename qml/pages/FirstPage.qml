@@ -76,7 +76,7 @@ Page {
             sleep_slider_color = "red";
             category_sleep_description = "Your not getting enough sleep. You should get between 7 and 9 hours of sleep each night!";
 
-        }else if(sleep_total >= 7 and sleep_total <= 9){
+        }else if(sleep_total >= 7 && sleep_total <= 9){
             sleep_category = "You sleep well!";
             sleep_slider_color = "#14f52a";
             category_sleep_description = "Your getting enough sleep.";
