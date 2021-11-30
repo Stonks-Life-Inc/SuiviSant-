@@ -60,6 +60,8 @@ ApplicationWindow
                                        METRIC_DATE DATE NOT NULL,
                                        CATEGORIE VARCHAR(20) NOT NULL,
                                        VAL DECIMAL(3,2) NOT NULL,
+                                       VAL2 DECIMAL(3,2),
+                                       VAL3 DECIMAL(3,2)
                                        PRIMARY KEY(USER_CODE,METRIC_CODE),
                                        FOREIGN KEY(USER_CODE) REFERENCES USERS(USER_CODE)
                                     );';
