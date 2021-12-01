@@ -23,10 +23,25 @@ Page {
     property string category_bmi;
     property string category_bmi_description;
     property string weight_slider_color;
+    property string sleep_slider_color;
+    property string sleep_total;
+    property string sleep_category;
+    property string category_sleep_description;
     property bool profiles;
     property variant wtData;
 
-    
+    function getProfiles(){
+            var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
+            db.transaction(
+                function(tx){
+                    var rs = tx.executeSql('SELECT * FROM USERS');
+                    if(rs.rows.length > 0){
+                        profiles = true;
+                    }
+                    else profiles=false;
+            })
+        }
+
 
     function load() {
         wtData = WtUtils.info_user(user_code);
@@ -90,6 +105,16 @@ Page {
 
     }
 
+    function loadUser(val) {
+        user_code=val;
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
+        db.transaction(
+        function(tx){
+            tx.executeSql('UPDATE SETTINGS USER_CODE=?',[user_code]);
+        })
+     }
+
+
     SilicaFlickable {
         anchors.fill: parent
 
@@ -97,10 +122,6 @@ Page {
             MenuItem {
                 text: "About"
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./About.qml'))
-            }
-            MenuItem {
-                text: "Graph test"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./GraphTest.qml'))
             }
             MenuItem {
                 visible: user_code!=''
@@ -200,7 +221,7 @@ Page {
 
              Slider {
                  visible: wtData.weight!==0
-                 id: changingSlider
+                 id: weightChangingSlider
                  value: bmi
                  minimumValue: 0
                  maximumValue: 50
@@ -246,44 +267,44 @@ Page {
 
 
             //Sleep calculation
-            // sleep time value
+             // Sleep time
              Label {
-                 visible: wtData.sleep_time!==0
-                 text: "You went to sleep at: "
-                 color: Theme.highlightColor
-                 font.pixelSize: Theme.fontSizeLarge
-                 anchors.left: parent.left
-                 anchors.leftMargin: 30
+                 visible: wtData.weight!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: u_sleepTime
+                 color: 'white'
              }
+
+             // Wake up time value
              Label {
-                 visible: wtData.wake_time!==0
-                 text: "You woke up at: "
-                 color: Theme.highlightColor
-                 font.pixelSize: Theme.fontSizeLarge
-                 anchors.left: parent.left
-                 anchors.leftMargin: 30
+                 visible: wtData.weight!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: u_wakeTime
+                 color: 'white'
              }
 
              Slider {
-                 visible: wtData.sleep_total!==0
-                 id: changingSlider
+                 visible: wtData.weight!==0
+                 id: sleepChangingSlider
                  value: sleep_total
                  minimumValue: 0
-                 maximumValue: 10
+                 maximumValue: 15
                  stepSize: 1
                  width: parent.width
                  handleVisible: false
                  enabled: handleVisible
-                 valueText : sleep_total.toFixed(2)
-                 label: sleep_category
-                 valueLabelColor: sleep_slider_color
-                 backgroundColor: sleep_slider_color
-                 color: sleep_slider_color
+                 valueText :sleep_total
+                 label: category_bmi
+                 valueLabelColor: weight_slider_color
+                 backgroundColor: weight_slider_color
+                 color: weight_slider_color
             }
 
              // Description
              Label {
-                 visible: wtData.sleep_total!==0
+                 visible: wtData.weight!==0
                  text: "Description"
                  color: Theme.highlightColor
                  font.pixelSize: Theme.fontSizeLarge
@@ -291,9 +312,18 @@ Page {
                  anchors.leftMargin: 30
              }
 
+             // Recommended sleep
+             Label {
+                 visible: wtData.weight!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: recommended_weight_description
+                 color: 'white'
+             }
+
              // BMI category description
              Label {
-                 visible: wtData.sleep_total!==0
+                 visible: wtData.weight!==0
                  wrapMode: Text.Wrap
                  width: parent.width
                  text: category_sleep_description

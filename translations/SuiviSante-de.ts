@@ -57,6 +57,13 @@
     </message>
 </context>
 <context>
+    <name>AddMetric</name>
+    <message>
+        <source>Add metric</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GraphTest</name>
     <message>
         <source>Graph test</source>
