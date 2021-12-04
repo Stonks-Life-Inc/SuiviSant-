@@ -10,11 +10,19 @@ Page {
     allowedOrientations: Orientation.All
 
     property variant usercodes: []
+    property string user_code;
     property int currentProfileIndex
     property string user_description;
+
+    //General user values
     property string u_height;
     property string u_weight;
-    property string user_code;
+    property string u_sleep_total;
+    property string u_sleep_time;
+    property string u_wake_time;
+
+    //Weight & BMI var
+    //include values, description messages, etc.
     property double bmi: 0.0;
     property double height_square: 0.0;
     property double recommended_min_weight: 0.0;
@@ -22,14 +30,18 @@ Page {
     property string recommended_weight_description;
     property string category_bmi;
     property string category_bmi_description;
+
+    //Sleep tracker var
+    //include values, description messages, etc.
     property string weight_slider_color;
     property string sleep_slider_color;
-    property string sleep_total;
     property string sleep_category;
     property string category_sleep_description;
+
     property bool profiles;
     property variant wtData;
 
+    //Function to get all profiles inside the database.
     function getProfiles(){
             var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
             db.transaction(
@@ -43,6 +55,9 @@ Page {
         }
 
 
+    //Load datas using the user_code, user_code being calculated on the first page completed loading
+    //Using js function inside utils.js files, we can retrieve data thanks to the user_code using SQL queries
+    //We wrote in this section the description messages.
     function load() {
         wtData = WtUtils.info_user(user_code);
 
@@ -50,7 +65,11 @@ Page {
         u_height = " Height: " + wtData.height + " cm"
         u_weight = " Weight: " + wtData.weight + " kg"
 
-        WtUtils.getProfiles();
+        u_sleep_time = "Sleep time: " + wtData.sleep_time
+        u_wake_time = "Wake up time: " + wtData.wake_time
+        u_sleep_total = "Sleep total: " + wtData.total_sleep
+
+        //WtUtils.getProfiles();
     }
 
     function calculate_bmi_category() {
@@ -501,8 +520,9 @@ Page {
              }
 
              Component.onCompleted:{
+                 print("Page load complete! Getting user_code from utils.js AND LOADING!")
                  user_code = WtUtils.getLastUser()
-                 load()
+                 //load()
              }
          }
 }

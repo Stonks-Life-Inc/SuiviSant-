@@ -59,7 +59,23 @@
 <context>
     <name>AddMetric</name>
     <message>
-        <source>Add metric</source>
+        <source>Add a new metric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can add your metric here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At the moment you can add:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your weight to get your BMI calculated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your sleep shcedule to track your sleep regularity</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

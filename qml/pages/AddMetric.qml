@@ -5,12 +5,13 @@ import QtQuick.LocalStorage 2.0
 import "../js/utils.js" as WtUtils
 
 Page {
-    id: newMetric
+    id: page
     backNavigation: true
     allowedOrientations: Orientation.All
 
     property string metric_code;
     property string user_code;
+
     property variant wtData;
     property string sleepTimeVal;
     property string wakeTimeVal;
@@ -36,13 +37,12 @@ Page {
     }
 
     function calculateSleepTotal(sleepTime, wakeTime) {
-        sleepTotal = sleepTime - wakeTime;
+        //TODO: Sleep total time calc
 
     }
 
     function addSleepMetric(sleepTime, wakeTime){
-        //sleepTime = sleepTime.replace(',', '.');
-        //wakeTime = wakeTime.replace(',', '.');
+
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         //if(depth==3) user_code=previousPage().rootPage.user_code;
         //else user_code=previousPage().user_code;
@@ -71,6 +71,7 @@ Page {
 
 
     function addWeightMetric(value){
+        print(user_code)
         value = value.replace(',', '.');
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         //if(depth==3) user_code=previousPage().rootPage.user_code;
@@ -88,7 +89,7 @@ Page {
                 date = Qt.formatDate(date, "yyyy-MM-dd");
 
                 var imc = calculateBMI()
-                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,?,?)',[user_code,metric_code,date,"WEIGHT",value, imc]);
+                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,?,?,null)',[user_code,metric_code,date,"WEIGHT",value, imc]);
                 rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=?',[user_code]);
             }
         )
@@ -116,23 +117,85 @@ Page {
 
         anchors.fill: parent
         contentHeight: column.height
-    }
 
-    Column {
-        id: mainColumn
-        x: Theme.paddingLarge
-        width:page.width
-        spacing: Theme.paddingLarge
+        Column {
+            id: mainColumn
+            x: Theme.paddingLarge
+            width:page.width
+            spacing: Theme.paddingLarge
 
-        PageHeader{
-            title: qsTr("Add metric")
-        }
+            PageHeader{
+                title: qsTr("Add a new metric")
+            }
+
+            Label {
+                text: qsTr("You can add your metric here")
+                width:page.width
+                color: Theme.secondaryHighlightColor
+            }
+            Label {
+                text: qsTr("At the moment you can add:")
+                width:page.width
+                color: Theme.secondaryHighlightColor
+            }
+            Label {
+                text: qsTr("Your weight to get your BMI calculated")
+                width:page.width
+                color: Theme.secondaryHighlightColor
+            }
+            Label {
+                text: qsTr("Your sleep shcedule to track your sleep regularity")
+                width:page.width
+                color: Theme.secondaryHighlightColor
+            }
+            ///////////////////////////////////////////////////////////////
+            //  Page pour rajouter une données de type WEIGHT dans la BD //
+            ///////////////////////////////////////////////////////////////
+            Component {
+                id: weightPage
+
+                Dialog {
+                    canAccept: weightMetricField.text!=""
+                    acceptDestination: page
+                    acceptDestinationAction: PageStackAction.Pop
+
+                    Flickable {
+                        width: parent.width
+                        height: parent.height
+
+                        Column {
+                            id: weightDialogColumn
+                            x: Theme.paddingLarge
+                            width: page.width
+                            spacing: Theme.paddingLarge
+
+                            DialogHeader { title: 'Add new weight metric' }
+
+                            TextField {
+                                id: weightMetricField
+                                width: parent.width
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                label: "kg"
+                                placeholderText: "Weight"
+                                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+
+                                validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
+                                focus: true
+                            }
+                        }
+                    }
+                    onAccepted: {
+                        addWeightMetric(weightMetricField.text)
+                        rootPage.load();
+                    }
+                }
+            }
 
         ///////////////////////////////////////////////////////////////
-        //  Page pour rajouter une données de type WEIGHT dans la BD //
+        //  Page pour rajouter une données de type SLEEP dans la BD  //
         ///////////////////////////////////////////////////////////////
         Component {
-            id: weightPage
+            id: sleepPage
 
             Dialog {
                 canAccept: weightMetricField.text!=""
@@ -144,53 +207,7 @@ Page {
                     height: parent.height
 
                     Column {
-                        id: dialogColumn
-                        x: Theme.paddingLarge
-                        width: page.width
-                        spacing: Theme.paddingLarge
-
-                        PageHeader { title: 'Add new weight metric' }
-
-                        TextField {
-                            id: weightMetricField
-                            width: parent.width
-                            inputMethodHints: Qt.ImhFormattedNumbersOnly
-                            label: "kg"
-                            placeholderText: "Weight"
-                            EnterKey.iconSource: "image://theme/icon-m-enter-next"
-
-                            validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
-                            focus: true
-                        }
-                        Button {
-                            text: 'Add'
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            enabled:weightMetricField.acceptableInput
-                            onClicked: addWeightMetric(weightMetricField.text)
-                        }
-                    }
-                }
-            }
-        }
-
-
-        ///////////////////////////////////////////////////////////////
-        //  Page pour rajouter une données de type SLEEP dans la BD  //
-        ///////////////////////////////////////////////////////////////
-        Component {
-            id: sleepPage
-
-            Dialog {
-                canAccept: sleepTime.text!="" && wakeTime.text!=""
-                acceptDestination: page
-                acceptDestinationAction: PageStackAction.Pop
-
-                Flickable {
-                    width: parent.width
-                    height: parent.height
-
-                    Column {
-                        id: dialogColumn
+                        id: sleepDialogColumn
                         x: Theme.paddingLarge
                         width: page.width
                         spacing: Theme.paddingLarge
@@ -198,6 +215,7 @@ Page {
                         PageHeader { title: 'Add new sleep metric' }
 
                         Button {
+
                              id: sleepTime
                              text: "Choose a sleeping time"
 
@@ -209,6 +227,7 @@ Page {
                                  })
                                  dialog.accepted.connect(function() {
                                      sleepTimeVal = dialog.timeText
+                                     sleepTime.text = "Choose a sleeping time: " + dialog.timeText
                                  })
                              }
                          }
@@ -224,18 +243,18 @@ Page {
                                  })
                                  dialog.accepted.connect(function() {
                                      wakeTimeVal = dialog.timeText
+                                     wakeTimeVal.text = "Choose a waking time: " + dialog.timeText
                                  })
                              }
                          }
-                        Button {
-                            text: 'Add'
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            enabled:sleepMetricField.acceptableInput, wakeMetricField.acceptableInput
-                            onClicked: addSleepMetric(sleepTimeVal, wakeTimeVal.text)
-                        }
                     }
-                }
+                 }
             }
         }
+        Component.onCompleted:{
+            user_code = WtUtils.getLastUser()
+            print(user_code)
+        }
     }
+}
 }

@@ -35,15 +35,19 @@ function info_user(user_code) {
                 metric_code = rs.rows.item(0).METRIC;
             }
 
+            //Récupérer les informations sur le poids de l'utilisateur dans la BD
             rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=? AND CATEGORIE=? AND METRIC_CODE=?',[user_code,"WEIGHT",metric_code]);
             if (rs.rows.length > 0) {
                 user_weight = parseFloat(rs.rows.item(0).VAL);
+                user_bmi = parseFloat(rs.rows.item(0).VAL2);
             }
 
-            user_height_m = user_height / 100
-            height_square = (user_height_m * user_height_m)
-            if ((user_weight > 0) && (user_height > 0)) {
-                user_bmi = user_weight / height_square;
+            //Récupérer les informations sur le poids de l'utilisateur dans la BD
+            rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=? AND CATEGORIE=? AND METRIC_CODE=?',[user_code,"SLEEP",metric_code]);
+            if (rs.rows.length > 0) {
+                user_sleepTime = parseFloat(rs.rows.item(0).VAL);
+                user_wakeTime = parseFloat(rs.rows.item(0).VAL2);
+                user__totalTime = parseFloat(rs.rows.items(0).VAL3);
             }
 
             arrayData = {
