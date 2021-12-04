@@ -47,7 +47,7 @@ function info_user(user_code) {
             if (rs.rows.length > 0) {
                 user_sleepTime = parseFloat(rs.rows.item(0).VAL);
                 user_wakeTime = parseFloat(rs.rows.item(0).VAL2);
-                user__totalTime = parseFloat(rs.rows.items(0).VAL3);
+                user_totalTime = parseFloat(rs.rows.items(0).VAL3);
             }
 
             arrayData = {

@@ -241,7 +241,7 @@ Page {
              Slider {
                  visible: wtData.weight!==0
                  id: weightChangingSlider
-                 value: bmi
+                 value: wtData.bmi
                  minimumValue: 0
                  maximumValue: 50
                  stepSize: 10

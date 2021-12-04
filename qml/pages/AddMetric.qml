@@ -42,7 +42,7 @@ Page {
     }
 
     function addSleepMetric(sleepTime, wakeTime){
-
+        print("Adding new sleep")
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         //if(depth==3) user_code=previousPage().rootPage.user_code;
         //else user_code=previousPage().user_code;
@@ -198,7 +198,7 @@ Page {
             id: sleepPage
 
             Dialog {
-                canAccept: weightMetricField.text!=""
+                canAccept: sleepTime.text!="Choose a sleeping time" && wakeTime.text!="Choose a waking time"
                 acceptDestination: page
                 acceptDestinationAction: PageStackAction.Pop
 
@@ -237,18 +237,22 @@ Page {
 
                              onClicked: {
                                  var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
-                                     hour: 22,
+                                     hour: 8,
                                      minute: 30,
                                      hourMode: DateTime.TwelveHours
                                  })
                                  dialog.accepted.connect(function() {
                                      wakeTimeVal = dialog.timeText
-                                     wakeTimeVal.text = "Choose a waking time: " + dialog.timeText
+                                     wakeTime.text = "Choose a waking time: " + dialog.timeText
                                  })
                              }
                          }
                     }
                  }
+                onAccepted: {
+                    addSleepMetric(sleepTimeVal, wakeTimeVal)
+                    rootPage.load();
+                }
             }
         }
         Component.onCompleted:{
