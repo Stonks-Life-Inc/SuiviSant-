@@ -109,6 +109,26 @@ Page {
 
                 onLinkActivated: Qt.openUrlExternally("https://gitlab.com/adelnoureddine/harbour-weight-tracker")
             }
+            Text {
+                text: "OR"
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+                font.pixelSize: Theme.fontSizeSmall
+                //linkColor: Theme.highlightColor
+
+                //onLinkActivated: Qt.openUrlExternally("https://github.com/Stonks-Life-Inc/SuiviSante")
+            }
+            Text {
+                text: "<a href=\"https://github.com/Stonks-Life-Inc/SuiviSante\">" + qsTr("View source code on GitHub") + "</a>"
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+                font.pixelSize: Theme.fontSizeSmall
+                linkColor: Theme.highlightColor
+
+                onLinkActivated: Qt.openUrlExternally("https://github.com/Stonks-Life-Inc/SuiviSante")
+            }
 
             SectionHeader {
                 text: qsTr("Health sources")

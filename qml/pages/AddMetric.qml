@@ -13,35 +13,37 @@ Page {
     property string user_code;
 
     property variant wtData;
-    property string sleepTimeVal;
-    property string wakeTimeVal;
-    property string sleepTotal;
+    property date sleepTimeVal;
+    property date wakeTimeVal;
+    property int sleepTotalValH;
+    property int sleepTotalValM;
 
     function load() {
         wtData = WtUtils.info_user(user_code);
 
-        WtUtils.getProfiles();
+        //WtUtils.getProfiles();
     }
 
-    function calculateBMI() {
-
-        var user_height = WtUtils.height / 100
+    function calculateBMI(weight) {
+        var bmi;
+        var user_height = wtData.height / 100
         var height_square = (user_height * user_height)
-        if ((WtUtils.weight > 0) && (user_height > 0)) {
-            bmi = WtUtils.weight / height_square;
-            // recommended_min_weight = 18.5 * height_square
-            // recommended_max_weight = 24.9 * height_square
-            // recommended_weight_description = "The recommended weight for your height is between " + recommended_min_weight.toFixed(2) + " kg and " + recommended_max_weight.toFixed(2) + " kg"
-            // calculate_bmi_category();
-        }
+        bmi = weight / height_square;
+        print("BMI = " + bmi)
+        return bmi
     }
 
     function calculateSleepTotal(sleepTime, wakeTime) {
+
         //TODO: Sleep total time calc
+        sleepTotalValH = wakeTime.getHours() - sleepTime.getHours()
+        sleepTotalValM = wakeTime.getMinutes() - sleepTime.getMinutes()
+
+        print(totalSleepTimeHOUR, totalSleepTimeMIN, totalSleepTimeVal)
 
     }
 
-    function addSleepMetric(sleepTime, wakeTime){
+    function addSleepMetric(){
         print("Adding new sleep")
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         //if(depth==3) user_code=previousPage().rootPage.user_code;
@@ -57,21 +59,30 @@ Page {
                 }
                 var date = new Date();
                 date = Qt.formatDate(date, "yyyy-MM-dd");
-                //sleepTotal = calculateSleepTotal(sleepTime, wakeTime)
-                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,?,?,?)',[user_code,metric_code,date,"SLEEP",sleepTime, wakeTime, sleepTotal]);
+                //var sleepTotalVal = calculateSleepTotal(sleepTimeVal, wakeTimeVal)
+                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,null,null,null,?,?,?,?,?,?)',[user_code,metric_code,date,"SLEEP",sleepTimeVal.getHours(),sleepTimeVal.getMinutes(), wakeTimeVal.getHours(), wakeTimeVal.getMinutes(), sleepTotalValH, sleepTotalValM]);
                 rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=?',[user_code]);
+                //Debug print to display added data
+                print("New sleep data : \n",
+                      "User code : " + user_code + "\n",
+                      "Metric code : " + metric_code + "\n",
+                      "Date : " + date + "\n",
+                      "Type : SLEEP \n",
+                      "Sleeping time : " + sleepTimeVal.getHours() + ":" + sleepTimeVal.getMinutes() + "\n",
+                      "Waking time : " + wakeTimeVal.getHours() + ":" + wakeTimeVal.getMinutes() + "\n",
+                      "Total sleep time : " + sleepTotalValH + ":" + sleepTotalValM + "\n")
             }
         )
         //reload homepage if adding from homepage or history if adding metric from history page
         previousPage().load();
         //reload homepage if add from history page
-        if(depth==3) previousPage().rootPage.load();
+        if(depth==3) previousPage().load();
         navigateBack(PageStackAction.Animated);
     }
 
 
     function addWeightMetric(value){
-        print(user_code)
+        var imc = calculateBMI()
         value = value.replace(',', '.');
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         //if(depth==3) user_code=previousPage().rootPage.user_code;
@@ -88,15 +99,23 @@ Page {
                 var date = new Date();
                 date = Qt.formatDate(date, "yyyy-MM-dd");
 
-                var imc = calculateBMI()
-                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,?,?,null)',[user_code,metric_code,date,"WEIGHT",value, imc]);
+                imc = calculateBMI(value)
+
+                rs = tx.executeSql('INSERT INTO METRICS VALUES (?,?,?,?,?,?,null,null,null,null,null,null,null)',[user_code,metric_code,date,"WEIGHT",value, imc]);
                 rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=?',[user_code]);
+                print("New weight data : \n",
+                      "User code : " + user_code + "\n",
+                      "Metric code : " + metric_code + "\n",
+                      "Date : " + date + "\n",
+                      "Type : WEIGHT \n",
+                      "Weight : " + value + "\n",
+                      "IMC : " + imc + "\n")
             }
         )
         //reload homepage if adding from homepage or history if adding metric from history page
         previousPage().load();
         //reload homepage if add from history page
-        if(depth==3) previousPage().rootPage.load();
+        if(depth==3) previousPage().load();
         navigateBack(PageStackAction.Animated);
     }
 
@@ -186,7 +205,7 @@ Page {
                     }
                     onAccepted: {
                         addWeightMetric(weightMetricField.text)
-                        rootPage.load();
+                        page.load();
                     }
                 }
             }
@@ -199,7 +218,7 @@ Page {
 
             Dialog {
                 canAccept: sleepTime.text!="Choose a sleeping time" && wakeTime.text!="Choose a waking time"
-                acceptDestination: page
+                //acceptDestination: page
                 acceptDestinationAction: PageStackAction.Pop
 
                 Flickable {
@@ -223,10 +242,11 @@ Page {
                                  var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
                                      hour: 22,
                                      minute: 30,
-                                     hourMode: DateTime.TwelveHours
+                                     hourMode: DateTime.TwentyFourHours
                                  })
                                  dialog.accepted.connect(function() {
-                                     sleepTimeVal = dialog.timeText
+                                     sleepTimeVal = dialog.time
+                                     print(sleepTimeVal.getHours() + ":" + sleepTimeVal.getMinutes())
                                      sleepTime.text = "Choose a sleeping time: " + dialog.timeText
                                  })
                              }
@@ -239,10 +259,11 @@ Page {
                                  var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
                                      hour: 8,
                                      minute: 30,
-                                     hourMode: DateTime.TwelveHours
+                                     hourMode: DateTime.TwentyFourHours
                                  })
                                  dialog.accepted.connect(function() {
-                                     wakeTimeVal = dialog.timeText
+                                     wakeTimeVal = dialog.time
+                                     print(wakeTimeVal.getHours() + ":" + wakeTimeVal.getMinutes())
                                      wakeTime.text = "Choose a waking time: " + dialog.timeText
                                  })
                              }
@@ -250,13 +271,15 @@ Page {
                     }
                  }
                 onAccepted: {
-                    addSleepMetric(sleepTimeVal, wakeTimeVal)
-                    rootPage.load();
+                    addSleepMetric()
+                    page.load();
+
                 }
             }
         }
         Component.onCompleted:{
             user_code = WtUtils.getLastUser()
+            load()
             print(user_code)
         }
     }

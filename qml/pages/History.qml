@@ -171,21 +171,7 @@ Page {
     ListModel {
         id: listModel
 
-//        ComboBox {
-//            function getCurrentIndex(){
-//                if (user_gender === "Weight") return 1
-//                if (user_gender === "Sleep") return 0
-//            }
 
-//            id:genderField
-//            currentIndex: getCurrentIndex()
-//            menu: ContextMenu {
-//                MenuItem { text: "Weight" }
-//                MenuItem { text: "Sleep" }
-//            }
-//            width: page.width
-//            label: "Metric category"
-//        }
 
         property bool populated
         property string metric_code;
@@ -209,7 +195,7 @@ Page {
                             var entries = rs.rows.length;
                             for(var i =0; i< rs.rows.length;i++){
                                 metric_tab[i] = rs.rows.item(i).METRIC_CODE;
-                                listModel.append({"text": rs.rows.item(i).METRIC_DATE + " | " + rs.rows.item(i).VAL + " kg | IBM " + rs.rows.item(i).VAL2});
+                                listModel.append({"text": rs.rows.item(i).METRIC_DATE + " | " + rs.rows.item(i).VAL + " kg | bmi " + rs.rows.item(i).VAL2});
                             }
                     }
                 )
@@ -223,7 +209,7 @@ Page {
                             var entries = rs.rows.length;
                             for(var i =0; i< rs.rows.length;i++){
                                 metric_tab[i] = rs.rows.item(i).METRIC_CODE;
-                                listModel.append({"text": rs.rows.item(i).METRIC_DATE + " | Sleep time: " + rs.rows.item(i).VAL + " | Wake up time: " + rs.rows.item(i).VAL2 + " | Total sleep time: " + rs.rows.item(i).VAL3});
+                                listModel.append({"text": rs.rows.item(i).METRIC_DATE + " | Sleep " + rs.rows.item(i).DATE1 + " | Wake " + rs.rows.item(i).DATE2 + " | Total " + rs.rows.item(i).DATE3});
 
                             }
                     }

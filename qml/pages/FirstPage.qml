@@ -23,7 +23,6 @@ Page {
 
     //Weight & BMI var
     //include values, description messages, etc.
-    property double bmi: 0.0;
     property double height_square: 0.0;
     property double recommended_min_weight: 0.0;
     property double recommended_max_weight: 0.0;
@@ -59,7 +58,13 @@ Page {
     //Using js function inside utils.js files, we can retrieve data thanks to the user_code using SQL queries
     //We wrote in this section the description messages.
     function load() {
+        print("Loading...")
         wtData = WtUtils.info_user(user_code);
+        print("User data weight test: " + wtData.weight)
+        print("User data weight test: " + wtData.bmi)
+
+        calculate_bmi_category()
+        calculate_sleep_effectivness()
 
         user_description = "Welcome " + wtData.firstname + " " + wtData.lastname + "!"
         u_height = " Height: " + wtData.height + " cm"
@@ -69,31 +74,31 @@ Page {
         u_wake_time = "Wake up time: " + wtData.wake_time
         u_sleep_total = "Sleep total: " + wtData.total_sleep
 
-        //WtUtils.getProfiles();
+        WtUtils.getProfiles();
     }
 
     function calculate_bmi_category() {
-        if (bmi < 18.5) {
+        if (wtData.bmi < 18.5) {
             category_bmi = "Underweight";
             weight_slider_color = "#2eb3db";
             category_bmi_description = "Your weight is under the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 25) {
+        } else if (wtData.bmi < 25) {
             category_bmi = "Normal weight";
             weight_slider_color = "#14f52a";
             category_bmi_description = "Your weight is in the normal category for adults of your height."
-        } else if (bmi < 30) {
+        } else if (wtData.bmi < 30) {
             category_bmi = "Overweight (pre-obesity)";
             weight_slider_color = "yellow";
             category_bmi_description = "Your weight is above the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 35) {
+        } else if (wtData.bmi < 35) {
             category_bmi = "Obese Class I";
             weight_slider_color = "orange";
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi < 40) {
+        } else if (wtData.bmi < 40) {
             category_bmi = "Obese Class II";
             weight_slider_color = "red";
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi >= 40) {
+        } else if (wtData.bmi >= 40) {
             category_bmi = "Obese Class III";
             weight_slider_color = "red";
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
@@ -105,17 +110,17 @@ Page {
     }
 
     function calculate_sleep_effectivness(){
-        if(sleep_total < 7){
+        if(wtData.sleep_total < 7){
             sleep_category = "Not enough sleep!";
             sleep_slider_color = "red";
             category_sleep_description = "Your not getting enough sleep. You should get between 7 and 9 hours of sleep each night!";
 
-        }else if(sleep_total >= 7 && sleep_total <= 9){
+        }else if(wtData.sleep_total >= 7 && wtData.sleep_total <= 9){
             sleep_category = "You sleep well!";
             sleep_slider_color = "#14f52a";
             category_sleep_description = "Your getting enough sleep.";
 
-        }else if(sleep_total > 9){
+        }else if(wtData.sleep_total > 9){
             sleep_category = "Too mcuh enough sleep!";
             sleep_slider_color = "red";
             category_sleep_description = "Your getting too much sleep. You should get between 7 and 9 hours of sleep each night!";
@@ -178,7 +183,7 @@ Page {
              x: Theme.paddingLarge
              width: parent.width - 2*x
              spacing: Theme.paddingLarge
-             PageHeader { title: "Weight Tracker"}
+             PageHeader { title: "Your data"}
 
 
 
@@ -214,11 +219,12 @@ Page {
              }
 
              ViewPlaceholder {
-                 enabled: wtData.weight==0 && user_code!=''
+                 enabled: wtData.weight===0 && user_code!=''
                  text: "No metrics avaible"
                  hintText: "Pull down to add metrics"
              }
 
+             SectionHeader{ text:"Weight track" }
              // Weight
              Label {
                  visible: wtData.weight!==0
@@ -248,7 +254,7 @@ Page {
                  width: parent.width
                  handleVisible: false
                  enabled: handleVisible
-                 valueText : bmi.toFixed(2)
+                 valueText : wtData.bmi
                  label: category_bmi
                  valueLabelColor: weight_slider_color
                  backgroundColor: weight_slider_color
@@ -283,47 +289,49 @@ Page {
                  color: 'white'
              }
 
-
-
-            //Sleep calculation
-             // Sleep time
              Label {
-                 visible: wtData.weight!==0
                  wrapMode: Text.Wrap
                  width: parent.width
-                 text: u_sleepTime
+                 text: ""
+
+             }
+
+
+            //====================================================
+            //         SLEEP Section
+            //====================================================
+            //Sleep calculation
+             // Sleep time
+             SectionHeader{ text:"Sleep track" }
+             Label {
+                 visible: wtData.total_sleep!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: u_sleep_time.getHours()+":"+u_sleep_time.getMinutes()
                  color: 'white'
              }
 
              // Wake up time value
              Label {
-                 visible: wtData.weight!==0
+                 visible: wtData.sleep_total!==0
                  wrapMode: Text.Wrap
                  width: parent.width
-                 text: u_wakeTime
+                 text: u_wake_time.getHours()+":"+u_wake_time.getMinutes()
                  color: 'white'
              }
 
-             Slider {
-                 visible: wtData.weight!==0
-                 id: sleepChangingSlider
-                 value: sleep_total
-                 minimumValue: 0
-                 maximumValue: 15
-                 stepSize: 1
+             // Total sleep time value
+             Label {
+                 visible: wtData.sleep_total!==0
+                 wrapMode: Text.Wrap
                  width: parent.width
-                 handleVisible: false
-                 enabled: handleVisible
-                 valueText :sleep_total
-                 label: category_bmi
-                 valueLabelColor: weight_slider_color
-                 backgroundColor: weight_slider_color
-                 color: weight_slider_color
-            }
+                 text: wtData.sleep_Total.getHours()+":"+sleep_Total.getMinutes()
+                 color: 'white'
+             }
 
              // Description
              Label {
-                 visible: wtData.weight!==0
+                 visible: wtData.sleep_total!==0
                  text: "Description"
                  color: Theme.highlightColor
                  font.pixelSize: Theme.fontSizeLarge
@@ -331,18 +339,9 @@ Page {
                  anchors.leftMargin: 30
              }
 
-             // Recommended sleep
+             // Sleep category description
              Label {
-                 visible: wtData.weight!==0
-                 wrapMode: Text.Wrap
-                 width: parent.width
-                 text: recommended_weight_description
-                 color: 'white'
-             }
-
-             // BMI category description
-             Label {
-                 visible: wtData.weight!==0
+                 visible: wtData.sleep_total!==0
                  wrapMode: Text.Wrap
                  width: parent.width
                  text: category_sleep_description
@@ -522,7 +521,7 @@ Page {
              Component.onCompleted:{
                  print("Page load complete! Getting user_code from utils.js AND LOADING!")
                  user_code = WtUtils.getLastUser()
-                 //load()
+                 load()
              }
          }
 }
