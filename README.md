@@ -10,13 +10,8 @@ Ajouter des données comme :
 * Poids
 * IMC (calculé par l’application)
 * Tours de taille, poitrine, etc.
-* Si exercices sportifs
-  * Nombre de pas
-  * Temps de jogging
 * Possibilité de supprimer certaines données
-* Afficher différents graphiques pour faire un suivi à travers le temps
-* Système de login pour chaque utilisateur (_Afin que chaque utilisateur ait accès à ses données et graphiques seulement._)
-
+* 
 ## Pourquoi ce projet ?
 	L’utilité de ce projet et de permettre de faire un suivi de son poids, sa taille, son activité sportif facilement pour la vie de tous les jours.
 Grâce à cette application, les utilisateurs pourront faire attention à leur santé et possiblement renseigner les médecins lors de visites.
