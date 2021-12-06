@@ -55,6 +55,10 @@
         <source>Sami Fernandez</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>View source code on GitHub</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AddMetric</name>

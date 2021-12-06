@@ -59,12 +59,20 @@ ApplicationWindow
                                        METRIC_CODE INTEGER NOT NULL,
                                        METRIC_DATE DATE NOT NULL,
                                        CATEGORIE VARCHAR(20) NOT NULL,
-                                       VAL DECIMAL(3,2) NOT NULL,
+                                       VAL DECIMAL(3,2),
                                        VAL2 DECIMAL(3,2),
                                        VAL3 DECIMAL(3,2),
+                                       DATEH1 INT,
+                                       DATEM1 INT,
+                                       DATEH2 INT,
+                                       DATEM2 INT,
+                                       DATEH3 INT,
+                                       DATEM3 INT,
                                        PRIMARY KEY(USER_CODE,METRIC_CODE),
                                        FOREIGN KEY(USER_CODE) REFERENCES USERS(USER_CODE)
                                     );';
+
+//        var createMetricsTable = 'DROP TABLE METRICS;';
         db.transaction(
             function(tx){
                 tx.executeSql(createMetricsTable);
