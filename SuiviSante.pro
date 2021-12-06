@@ -24,12 +24,12 @@ DISTFILES += \
     qml/pages/GraphTest.qml \
     qml/pages/SecondPage.qml \
     qml/pages/About.qml \
-    qml/pages/AddMetric.qml \
     qml/pages/History.qml \
     qml/pages/Profile_Settings.qml \
     qml/js/util.js \
     qml/js/d3.js \
     qml/js/utils.js \
+    qml/pages/Weight.qml \
     rpm/SuiviSante.changes.in \
     rpm/SuiviSante.changes.run.in \
     rpm/SuiviSante.spec \
