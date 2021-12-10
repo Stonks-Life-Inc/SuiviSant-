@@ -1,24 +1,59 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/qml,qt,qtcreator,visualstudiocode,visualstudio
-# Edit at https://www.toptal.com/developers/gitignore?templates=qml,qt,qtcreator,visualstudiocode,visualstudio
+# Created by https://www.toptal.com/developers/gitignore/api/qt,qtcreator,visualstudiocode,c++,visualstudio,git
+# Edit at https://www.toptal.com/developers/gitignore?templates=qt,qtcreator,visualstudiocode,c++,visualstudio,git
 
-### QML ###
-# Cached binary representations of QML and JS files
-*.qmlc
-*.jsc
+### C++ ###
+# Prerequisites
+*.d
 
-### Qt ###
-# C++ objects and libs
+# Compiled Object files
 *.slo
 *.lo
 *.o
-*.a
-*.la
-*.lai
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
 *.so
-*.so.*
-*.dll
 *.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+### Qt ###
+# C++ objects and libs
+*.so.*
 
 # Qt-es
 object_script.*.Release
@@ -35,6 +70,8 @@ moc_*.cpp
 moc_*.h
 qrc_*.cpp
 ui_*.h
+*.qmlc
+*.jsc
 Makefile*
 *build-*
 *.qm
@@ -189,9 +226,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
 *.iobj
-*.pch
 *.pdb
 *.ipdb
 *.pgc
@@ -498,4 +533,4 @@ FodyWeavers.xsd
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
-# End of https://www.toptal.com/developers/gitignore/api/qml,qt,qtcreator,visualstudiocode,visualstudio
+# End of https://www.toptal.com/developers/gitignore/api/qt,qtcreator,visualstudiocode,c++,visualstudio,git

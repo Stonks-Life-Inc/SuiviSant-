@@ -10,97 +10,134 @@ Page {
     allowedOrientations: Orientation.All
 
     property variant usercodes: []
+    property string user_code;
     property int currentProfileIndex
     property string user_description;
+
+    //General user values
     property string u_height;
     property string u_weight;
-    property string user_code;
-    property double bmi: 0.0;
+    property string u_sleep_total;
+    property string u_sleep_time;
+    property string u_wake_time;
+
+    //Weight & BMI var
+    //include values, description messages, etc.
     property double height_square: 0.0;
     property double recommended_min_weight: 0.0;
     property double recommended_max_weight: 0.0;
     property string recommended_weight_description;
     property string category_bmi;
     property string category_bmi_description;
-    property string slider_color;
+
+    //Sleep tracker var
+    //include values, description messages, etc.
+    property string weight_slider_color;
+    property string sleep_slider_color;
+    property string sleep_category;
+    property string category_sleep_description;
+
     property bool profiles;
     property variant wtData;
 
+    //Function to get all profiles inside the database.
     function getProfiles(){
-        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-        db.transaction(
-            function(tx){
-                var rs = tx.executeSql('SELECT * FROM USERS');
-                if(rs.rows.length > 0){
-                    profiles = true;
-                }
-                else profiles=false;
-        })
-    }
+            var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
+            db.transaction(
+                function(tx){
+                    var rs = tx.executeSql('SELECT * FROM USERS');
+                    if(rs.rows.length > 0){
+                        profiles = true;
+                    }
+                    else profiles=false;
+            })
+        }
 
+
+    //Load datas using the user_code, user_code being calculated on the first page completed loading
+    //Using js function inside utils.js files, we can retrieve data thanks to the user_code using SQL queries
+    //We wrote in this section the description messages.
     function load() {
+        print("Loading...")
         wtData = WtUtils.info_user(user_code);
+        print("User data weight test: " + wtData.weight)
+        print("User data weight test: " + wtData.bmi)
+
+        calculate_bmi_category()
+        calculate_sleep_effectivness()
 
         user_description = "Welcome " + wtData.firstname + " " + wtData.lastname + "!"
         u_height = " Height: " + wtData.height + " cm"
         u_weight = " Weight: " + wtData.weight + " kg"
 
-        calculate();
-        getProfiles();
+        u_sleep_time = "Sleep time: " + wtData.sleep_time
+        u_wake_time = "Wake up time: " + wtData.wake_time
+        u_sleep_total = "Sleep total: " + wtData.total_sleep
+
+        WtUtils.getProfiles();
+    }
+
+    function calculate_bmi_category() {
+        if (wtData.bmi < 18.5) {
+            category_bmi = "Underweight";
+            weight_slider_color = "#2eb3db";
+            category_bmi_description = "Your weight is under the recommended values. Talk to your doctor for medical advice."
+        } else if (wtData.bmi < 25) {
+            category_bmi = "Normal weight";
+            weight_slider_color = "#14f52a";
+            category_bmi_description = "Your weight is in the normal category for adults of your height."
+        } else if (wtData.bmi < 30) {
+            category_bmi = "Overweight (pre-obesity)";
+            weight_slider_color = "yellow";
+            category_bmi_description = "Your weight is above the recommended values. Talk to your doctor for medical advice."
+        } else if (wtData.bmi < 35) {
+            category_bmi = "Obese Class I";
+            weight_slider_color = "orange";
+            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
+        } else if (wtData.bmi < 40) {
+            category_bmi = "Obese Class II";
+            weight_slider_color = "red";
+            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
+        } else if (wtData.bmi >= 40) {
+            category_bmi = "Obese Class III";
+            weight_slider_color = "red";
+            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
+        } else {
+            category_bmi = "Unkown category";
+            weight_slider_color = "white";
+            category_bmi_description = ""
+        }
+    }
+
+    function calculate_sleep_effectivness(){
+        if(wtData.sleep_total < 7){
+            sleep_category = "Not enough sleep!";
+            sleep_slider_color = "red";
+            category_sleep_description = "Your not getting enough sleep. You should get between 7 and 9 hours of sleep each night!";
+
+        }else if(wtData.sleep_total >= 7 && wtData.sleep_total <= 9){
+            sleep_category = "You sleep well!";
+            sleep_slider_color = "#14f52a";
+            category_sleep_description = "Your getting enough sleep.";
+
+        }else if(wtData.sleep_total > 9){
+            sleep_category = "Too mcuh enough sleep!";
+            sleep_slider_color = "red";
+            category_sleep_description = "Your getting too much sleep. You should get between 7 and 9 hours of sleep each night!";
+
+        }
+
     }
 
     function loadUser(val) {
         user_code=val;
         var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
-            function(tx){
-                tx.executeSql('UPDATE SETTINGS USER_CODE=?',[user_code]);
-            })
-    }
+        function(tx){
+            tx.executeSql('UPDATE SETTINGS USER_CODE=?',[user_code]);
+        })
+     }
 
-    function calculate() {
-        var user_height = wtData.height / 100
-        height_square = (user_height * user_height)
-        if ((wtData.weight > 0) && (user_height > 0)) {
-            bmi = wtData.weight / height_square;
-            recommended_min_weight = 18.5 * height_square
-            recommended_max_weight = 24.9 * height_square
-            recommended_weight_description = "The recommended weight for your height is between " + recommended_min_weight.toFixed(2) + " kg and " + recommended_max_weight.toFixed(2) + " kg"
-            calculate_bmi_category();
-        }
-    }
-
-    function calculate_bmi_category() {
-        if (bmi < 18.5) {
-            category_bmi = "Underweight";
-            slider_color = "#2eb3db";
-            category_bmi_description = "Your weight is under the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 25) {
-            category_bmi = "Normal weight";
-            slider_color = "#14f52a";
-            category_bmi_description = "Your weight is in the normal category for adults of your height."
-        } else if (bmi < 30) {
-            category_bmi = "Overweight (pre-obesity)";
-            slider_color = "yellow";
-            category_bmi_description = "Your weight is above the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 35) {
-            category_bmi = "Obese Class I";
-            slider_color = "orange";
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi < 40) {
-            category_bmi = "Obese Class II";
-            slider_color = "red";
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi >= 40) {
-            category_bmi = "Obese Class III";
-            slider_color = "red";
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else {
-            category_bmi = "Unkown category";
-            slider_color = "white";
-            category_bmi_description = ""
-        }
-    }
 
     SilicaFlickable {
         anchors.fill: parent
@@ -109,10 +146,6 @@ Page {
             MenuItem {
                 text: "About"
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./About.qml'))
-            }
-            MenuItem {
-                text: "Graph test"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./GraphTest.qml'))
             }
             MenuItem {
                 visible: user_code!=''
@@ -150,7 +183,7 @@ Page {
              x: Theme.paddingLarge
              width: parent.width - 2*x
              spacing: Theme.paddingLarge
-             PageHeader { title: "Weight Tracker"}
+             PageHeader { title: "Your data"}
 
 
 
@@ -186,11 +219,12 @@ Page {
              }
 
              ViewPlaceholder {
-                 enabled: wtData.weight==0 && user_code!=''
+                 enabled: wtData.weight===0 && user_code!=''
                  text: "No metrics avaible"
                  hintText: "Pull down to add metrics"
              }
 
+             SectionHeader{ text:"Weight track" }
              // Weight
              Label {
                  visible: wtData.weight!==0
@@ -212,19 +246,19 @@ Page {
 
              Slider {
                  visible: wtData.weight!==0
-                 id: changingSlider
-                 value: bmi
+                 id: weightChangingSlider
+                 value: wtData.bmi
                  minimumValue: 0
                  maximumValue: 50
                  stepSize: 10
                  width: parent.width
                  handleVisible: false
                  enabled: handleVisible
-                 valueText : bmi.toFixed(2)
+                 valueText : wtData.bmi
                  label: category_bmi
-                 valueLabelColor: slider_color
-                 backgroundColor: slider_color
-                 color: slider_color
+                 valueLabelColor: weight_slider_color
+                 backgroundColor: weight_slider_color
+                 color: weight_slider_color
             }
 
              // Description
@@ -255,6 +289,64 @@ Page {
                  color: 'white'
              }
 
+             Label {
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: ""
+
+             }
+
+
+            //====================================================
+            //         SLEEP Section
+            //====================================================
+            //Sleep calculation
+             // Sleep time
+             SectionHeader{ text:"Sleep track" }
+             Label {
+                 visible: wtData.total_sleep!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: u_sleep_time.getHours()+":"+u_sleep_time.getMinutes()
+                 color: 'white'
+             }
+
+             // Wake up time value
+             Label {
+                 visible: wtData.sleep_total!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: u_wake_time.getHours()+":"+u_wake_time.getMinutes()
+                 color: 'white'
+             }
+
+             // Total sleep time value
+             Label {
+                 visible: wtData.sleep_total!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: wtData.sleep_Total.getHours()+":"+sleep_Total.getMinutes()
+                 color: 'white'
+             }
+
+             // Description
+             Label {
+                 visible: wtData.sleep_total!==0
+                 text: "Description"
+                 color: Theme.highlightColor
+                 font.pixelSize: Theme.fontSizeLarge
+                 anchors.left: parent.left
+                 anchors.leftMargin: 30
+             }
+
+             // Sleep category description
+             Label {
+                 visible: wtData.sleep_total!==0
+                 wrapMode: Text.Wrap
+                 width: parent.width
+                 text: category_sleep_description
+                 color: 'white'
+             }
              Component {
                  id: createProfile
 
@@ -427,6 +519,7 @@ Page {
              }
 
              Component.onCompleted:{
+                 print("Page load complete! Getting user_code from utils.js AND LOADING!")
                  user_code = WtUtils.getLastUser()
                  load()
              }

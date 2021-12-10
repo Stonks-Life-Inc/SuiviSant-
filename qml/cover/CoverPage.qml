@@ -12,7 +12,7 @@ CoverBackground {
         label_first_name.text = WtData.firstname;
         label_last_name.text = WtData.lastname;
         label_weight.text = WtData.weight + " kg";
-        label_bmi.text = "BMI: " + WtData.bmi.toFixed(2);
+        label_bmi.text = "BMI: " + WtData.bmi;
     }
 
     Label {
